@@ -3,31 +3,38 @@ from math import sqrt
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
-def brownian(steps,time):
+def brownian(steps,delta,particles, save = False):
     '''A function which mimics brownian motion, specifically the Wiener process
-            X(t+dt)=X_0+(exp(-x**2 / 2*t)/sqrt(s*pi*t)), with the goal of making 
-            it as simple as possible to abstract to 3 dimensions'''
+            X(t+dt)=X_0+(exp(-x**2 / 2*t)/sqrt(s*pi*t)).
+            
+            Steps: the number of steps each particle will take
+            delta: the variance of the gaussian
+            particles: number of particles to measure
+            save: boolean; set to True is you want to save the figure'''
     X_0, Y_0, Z_0 = 0,0,0
     mean = 0
-    delta = time/steps
-    X,Y,Z = [X_0],[Y_0],[Z_0]
-
-    t =np.linspace(0,steps+1,steps+1)
-       
     
-    for s in range(steps):
-        X.append(X[s]+np.random.normal(mean,delta))
-        Y.append(Y[s]+np.random.normal(mean,delta))
-        Z.append(Z[s]+np.random.normal(mean,delta))
+    fig = plt.figure()             #### Begin the figure and initialze
+    ax = plt.axes(projection = '3d')###    to accept 3-d input
+    
+    for part in range(particles):  # open loop to number of particles
+        X,Y,Z = [X_0],[Y_0],[Z_0]  # reset inital list to baseline
+    
+        for s in range(steps): # Open loop to create list of 'walk' distances
+            X.append(X[s]+np.random.normal(mean,delta))
+            Y.append(Y[s]+np.random.normal(mean,delta))
+            Z.append(Z[s]+np.random.normal(mean,delta))
         
-    print(len(X))
-    print(len(t))
-    fig = plt.figure()
-    ax = plt.axes(projection = '3d')
-    #plot(X,Y,Z)
-    ax.plot3D(X,Y,Z,'gray')
-    ax.scatter3D(X[0],Y[0],Z[0],'go')
-    ax.scatter3D(X[-1],Y[-1],Z[-1],'ro')
-    show()
+        ax.plot3D(X,Y,Z, alpha = .45)################### Plot walk before closing loop
+        ax.scatter(X[-1],Y[-1],Z[-1],'.', alpha = .75)## Plot endpoint before closing loop
+        
+    plt.title('Brownian Motion',size = '16') # Name, label, and resize figure
+    plt.xlabel('x')                      #####     to make figure fit in
+    plt.ylabel('y')                     ######     latex better
+    ax.set_zlabel('z')
+    fig.set_size_inches(10,10)
+    if save == True:
+        fig.savefig('BrownianMotion.png', bbox_inches = 'tight') # name and crop picture
+    plt.show()
     
-brownian(1000,100)
+brownian(1000,0.025,15,True)
